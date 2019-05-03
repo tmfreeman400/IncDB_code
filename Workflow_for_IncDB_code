@@ -1,0 +1,27 @@
+**README file for running code to generate IncDB from .bam files**
+
+To-do: Specify authorship and licence (ask permission to share) in header of code files
+-Add in build 38 chromosome sizes
+-Write a single script for each step with clear names and run order
+
+
+Steps:
+
+-samtools mpileup module (samtools/1.9) and cluster module must be loaded before starting process
+
+-Generate files with zeros
+-Do mpileup of reads over all patients and chromosomes to get the number of A/C/G/T reads per locus
+-Combine outputs from above into single files for each patient/chromosome combination, with four columns corresponding to ACGT, and n rows, where n is the size of the chromosome in bps.
+
+-In 100,000bp chunks for each chromosome (due to limitations in Genomics England HPC computing power), normalise the per patient numbers of reads at each position and generate normalised individual patient read counts.
+
+-Using normalised individual patient read counts, generate normalised population allelic fraction and standard deviation between individual allelic fractions for each locus/nucleotide combination across the whole chunk, repeating for all chunks in the chromosome (if chromosomes have previously been separated into chunks).
+
+-Combine all chunks together within each chromosome for both population allelic fraction and standard deviation score matrices (if separated into chunks, not necessary if done as whole chromosomes).
+
+
+Additional analyses:
+
+-Plot population allelic fraction against standard deviation
+-Generate MC model of HW-expected values to generate 0.1% confidence intervals
+-Filter out loci/allele combinations that fall below the minimum 0.1% confidence interval (after filtering out reference allele combinations) - this leaves behind consistent, low AF systematic errors.
