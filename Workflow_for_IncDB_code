@@ -1,27 +1,50 @@
 **README file for running code to generate IncDB from .bam files**
 
-To-do: Specify authorship and licence (ask permission to share) in header of code files
--Add in build 38 chromosome sizes
--Write a single script for each step with clear names and run order
+Dependencies:
 
+-Samtools (we used version 1.9) required for the mpileup command
+-R version 3.4.4 (2018-03-15) or later
 
 Steps:
 
--samtools mpileup module (samtools/1.9) and cluster module must be loaded before starting process
+1)
+-Ensure dependencies are loaded.
 
--Generate files with zeros
--Do mpileup of reads over all patients and chromosomes to get the number of A/C/G/T reads per locus
--Combine outputs from above into single files for each patient/chromosome combination, with four columns corresponding to ACGT, and n rows, where n is the size of the chromosome in bps.
+2)
+-Run structure_directories.sh in the directory you want to use for carrying out these steps. We recommend creating an empty directory for this.
+Pass the desired project directory filepath to this script as the only argument.
+This script creates an empty folder structure for various temporary files and the final outputs to be saved in that is referred back to by the subsequent commands.
 
--In 100,000bp chunks for each chromosome (due to limitations in Genomics England HPC computing power), normalise the per patient numbers of reads at each position and generate normalised individual patient read counts.
+3)
+Write all of the filepaths for all of the patient/sample BAM files into a single text file in the project directory entitled "patient_bams_list.txt", with one filepath per row, so that each row corresponds to a different BAM file.
+This file is used to point the following scripts to the correct BAM files using a single number.
 
--Using normalised individual patient read counts, generate normalised population allelic fraction and standard deviation between individual allelic fractions for each locus/nucleotide combination across the whole chunk, repeating for all chunks in the chromosome (if chromosomes have previously been separated into chunks).
+4)
+-Run build_empty_matrices.R
+Pass the chromosome number to this script as the first argument (e.g. 1, 2, 3, etc.), the genome build as the second argument (37 or 38), and the project directory as the third argument.
+This creates empty matrices in the directory structure for the chromosome specified, for use by get_af.R
 
--Combine all chunks together within each chromosome for both population allelic fraction and standard deviation score matrices (if separated into chunks, not necessary if done as whole chromosomes).
+5)
+-Run mpileup_read_count.R (must be run multiple times - once for each patient/chromosome combination)
+Pass the patient/sample number (i.e. the number of the corresponding row in the patient filepath list in (3)) as the first argument and the chromosome number as the second argument.
+Edit the first 11 lines of this file to match your system before running, as noted in the comments.
+This script counts the numbers of reads in the BAM file for all alleles (A, C, G, T) in a specific chromosome and creates separate outputs for each, which are used in the next step.
 
+6)
+-Run get_af.R (must be run multiple times - once for each patient/chromosome combination)
+Pass the patient/sample number (i.e. the number of the corresponding row in the patient filepath list in (3)) as the first argument and the chromosome number as the second argument.
+Edit the first 11 lines of this file to match your system before running, as noted in the comments.
+This script uses the output of mpileup_read_count.R to fill empty chromosomal matrices with allelic frequencies for all allelic reads (A, C, G, T), for each patient/chromosome combination.
 
-Additional analyses:
+7)
+-Run get_mean_af.sh (must be run multiple times - once for each autosomal chromosome being examined)
+Pass filepath to project directory as the first argument, and chromosome number as the second argument.
+This script outputs the first half of the IncDB: mean (aggregate) allelic fractions which form the IncDB along with corresponding SD values.
 
--Plot population allelic fraction against standard deviation
--Generate MC model of HW-expected values to generate 0.1% confidence intervals
--Filter out loci/allele combinations that fall below the minimum 0.1% confidence interval (after filtering out reference allele combinations) - this leaves behind consistent, low AF systematic errors.
+8)
+-Run get_sd_af.sh (must be run multiple times - once for each autosomal chromosome being examined)
+Pass filepath to project directory as the first argument, and chromosome number as the second argument.
+This script outputs the second half of the IncDB: standard deviations of allelic fractions which form the IncDB along with corresponding mean allelic fraction values.
+
+OUTPUT:
+The IncDB files are labelled meanAF.txt and sdAF.txt respectively and are located in the folder corresponding to the chromosome examined. E.g. chr21/meanAF.txt and chr21/sdAF.txt together form the IncDB for chromosome 21.
