@@ -39,10 +39,10 @@ done
 
 #Merge chunks into output
 currentchunk=1
-cat sdAF_chunk1.txt > sdAF.txt
+cat sdAF_schunk1.txt > sdAF.txt
 while [[ $currentchunk -lt $numchunks ]]; do
 nextchunk=`echo $((1+$currentchunk))`
-cat sdAF.txt sdAF_chunk$nextchunk.txt > tempsdAF.txt
+cat sdAF.txt sdAF_schunk$nextchunk.txt > tempsdAF.txt
 cat tempsdAF.txt > sdAF.txt
 currentchunk=`echo $nextchunk`
 done
