@@ -39,10 +39,10 @@ done
 
 #Merge chunks into output
 currentchunk=1
-cat meanAF_chunk1.txt > meanAF.txt
+cat meanAF_mchunk1.txt > meanAF.txt
 while [[ $currentchunk -lt $numchunks ]]; do
 nextchunk=`echo $((1+$currentchunk))`
-cat meanAF.txt meanAF_chunk$nextchunk.txt > tempmeanAF.txt
+cat meanAF.txt meanAF_mchunk$nextchunk.txt > tempmeanAF.txt
 cat tempmeanAF.txt > meanAF.txt
 currentchunk=`echo $nextchunk`
 done
