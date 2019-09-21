@@ -17,7 +17,7 @@ currentchunk=1
 while [[ $currentchunk -le $numchunks ]]; do
 maxco=`echo $(($currentchunk*1000000))`
 #Generate chunks
-tag="_chunk"
+tag="_mchunk"
 for file in *soloDB; do
 awk -v maxc=$maxco 'NR==maxc-999999, NR==maxc-1; NR==maxc {print; exit}' $file > $file$tag$currentchunk
 done;
@@ -49,9 +49,9 @@ done
 
 #Delete chunks and temporary files
 rm tempmeanAF.txt
-rm *chunk?.txt
-rm *chunk??.txt
-rm *chunk?
-rm *chunk??
-
-
+rm *meanAF_mchunk?.txt
+rm *meanAF_mchunk??.txt
+rm *meanAF_mchunk???.txt
+rm *mchunk?
+rm *mchunk??
+rm *mchunk???
