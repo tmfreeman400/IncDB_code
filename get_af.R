@@ -10,9 +10,12 @@ project_directory <- 'path_to_project_directories' #REPLACE this with the filepa
 build_number <- 38 #Replace with 37 if you are using build 37
 
 #NO EDITS SHOULD BE REQUIRED AFTER THIS POINT
+args[3] <- build_number
 
 directories <- unlist(strsplit(scan(pat_filepaths, what = 'character')[1], split='/'))
 finalsplit <- paste0('_', directories[length(directories)-1], '_') #Name of the last sub-directory in which bam files are located
+
+#NO EDITS SHOULD BE REQUIRED AFTER THIS POINT
 
 #Create solo DB row-by-row by adding base counts where indicated
 #And saving separate record for each patient
@@ -51,25 +54,51 @@ last_chunk_num <- c(5,5,4,4,4,4,4,3,3,3,3,3,3,3,3,2,2,2,2,2,1,2)[chrnum]
 
 for(patno in patnum){
   
-  DBtofill=read.table(paste0(project_directory, 'Empty_IncDB', build_number, '_', chrnum), sep = '\t',
-                      col.names = c('A', 'C', 'G', 'T'), header = FALSE, as.is = TRUE)
+  #Select chunk
+  
+  for(chunknum in 1:last_chunk_num){
+  
+  #Generate DBtofill for this chunk- either 50M rows or smaller if last chunk
+  
+  for(chrnum in as.numeric(args[2])){
+    
+    #Get lenngths of all chromosomes for their genome build
+    chrlengths37 = c(249250621, 243199373, 198022430, 191154276,
+                     180915260, 171115067, 159138663, 146364022,
+                     141213431, 135534747, 135006516, 133851895,
+                     115169878, 107349540, 102531392, 90354753,
+                     81195210, 78077248, 59128983, 63025520,
+                     48129895, 51304566)
+    
+    chrlengths38 = c(248956422, 242193529, 198295559, 190214555,
+                     181538259, 170805979, 159345973, 145138636,
+                     138394717, 133797422, 135086622, 133275309,
+                     114364328, 107043718, 101991189, 90338345,
+                     83257441, 80373285, 58617616, 64444167,
+                     46709983, 50818468)
+    
+    chrlength37 = chrlengths37[chrnum]
+    chrlength38 = chrlengths38[chrnum]
+    
+    if(as.numeric(args[3]==37)){maxchrlength = chrlength37}
+    if(as.numeric(args[3]==38)){maxchrlength = chrlength38}
+    
+    #Get chunklength from maxchrlength and chunknum
+    if(chunknum<last_chunk_num){chunklength <- 50000000}
+    if(chunknum==last_chunk_num){chunklength <- maxchrlength-(chunknum-1)*50000000}
+    
+    DBtofill = matrix(0,chunklength,4)
+    
+  }
+  
+  #Fill DBtofill looping through each allele
   
   for(basetype in 1:4){
     baseallele = c('A','C','G','T')[basetype]
     
-    #Read in data from first chunk
-    filler=read.table(paste0(uniq_stems[patno], gpat, 1, '_', baseallele,'counts.txt'),
+    #Read in data from chunk
+    filler=read.table(paste0(uniq_stems[patno], gpat, chunknum, '_', baseallele,'counts.txt'),
                       header = FALSE, as.is = TRUE)
-    
-    #Read in data from following chunks and rbind together
-    if(last_chunk_num>1){
-      for(chunknum in 2:last_chunk_num){
-        tempfiller=read.table(paste0(uniq_stems[patno], gpat, chunknum, '_', baseallele, 'counts.txt'),
-                              header = FALSE, as.is = TRUE)
-        tempfiller[,2] <- tempfiller[,2]+((chunknum - 1)*50000000)
-        filler=rbind(filler, tempfiller)
-      }
-    }
     
     #Write count values to matrix at corresponding rows
     rowindices = as.numeric(filler[,2])
@@ -89,7 +118,17 @@ for(patno in patnum){
   DBtofill[is.nan(DBtofill)] <- 0
   
   #Save results for single patient
-  write.table(DBtofill, file = paste0(uniq_stems[patno], 'chr', chrnum, '_soloDB'), row.names = FALSE, col.names = FALSE, sep = '\t')
-}
+  write.table(DBtofill, file = paste0(uniq_stems[patno], 'chr', chrnum, '_soloDBchunk', chunknum), row.names = FALSE, col.names = FALSE, sep = '\t')
+  
+  }
+
+  #cat chunks together into finished soloDB and rm chunks
+  names2cat <- paste0(uniq_stems[patno], 'chr', chrnum, '_soloDBchunk*')
+  cattedoutput <- paste0(uniq_stems[patno], 'chr', chrnum, '_soloDB')
+  systemcommand = paste0("cat ", names2cat, " > ", cattedoutput)
+  system(systemcommand, wait = TRUE)
+  
+  system(paste0("rm ", names2cat), wait = TRUE)
+  }
 
 #For next step run get_mean_af.sh and get_sd_af.sh
