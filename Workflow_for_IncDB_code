@@ -20,28 +20,23 @@ Write all of the filepaths for all of the patient/sample BAM files into a single
 This file is used to point the following scripts to the correct BAM files using a single number.
 
 4)
--Run build_empty_matrices.R
-Pass the chromosome number to this script as the first argument (e.g. 1, 2, 3, etc.), the genome build as the second argument (37 or 38), and the project directory as the third argument.
-This creates empty matrices in the directory structure for the chromosome specified, for use by get_af.R
-
-5)
 -Run mpileup_read_count.R (must be run multiple times - once for each patient/chromosome combination)
 Pass the patient/sample number (i.e. the number of the corresponding row in the patient filepath list in (3)) as the first argument and the chromosome number as the second argument.
 Edit the first 11 lines of this file to match your system before running, as noted in the comments.
 This script counts the numbers of reads in the BAM file for all alleles (A, C, G, T) in a specific chromosome and creates separate outputs for each, which are used in the next step.
 
-6)
+5)
 -Run get_af.R (must be run multiple times - once for each patient/chromosome combination)
 Pass the patient/sample number (i.e. the number of the corresponding row in the patient filepath list in (3)) as the first argument and the chromosome number as the second argument.
 Edit the first 11 lines of this file to match your system before running, as noted in the comments.
 This script uses the output of mpileup_read_count.R to fill empty chromosomal matrices with allelic frequencies for all allelic reads (A, C, G, T), for each patient/chromosome combination.
 
-7)
+6)
 -Run get_mean_af.sh (must be run multiple times - once for each autosomal chromosome being examined)
 Pass filepath to project directory as the first argument, and chromosome number as the second argument.
 This script outputs the first half of the IncDB: mean (aggregate) allelic fractions which form the IncDB along with corresponding SD values.
 
-8)
+7)
 -Run get_sd_af.sh (must be run multiple times - once for each autosomal chromosome being examined)
 Pass filepath to project directory as the first argument, and chromosome number as the second argument.
 This script outputs the second half of the IncDB: standard deviations of allelic fractions which form the IncDB along with corresponding mean allelic fraction values.
