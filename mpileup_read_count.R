@@ -7,7 +7,7 @@ system('module load samtools/1.9')
 
 #Edit the filepaths in this section to the corresponding filepaths on your system so that the code functions correctly
 pat_filepaths  <- 'path_to_textfile_listing_patient_bam_filepaths' #REPLACE this with the filepath to your list
-project_directory <- 'path_to_project_directories' #REPLACE this with the filepath to the directories created by the build_directories.R command
+project_directory <- paste0('path_to_project_directories','/') #REPLACE this with the filepath to the directories created by the build_directories.R command
 build_number <- 38 #Replace with 37 if you are using build 37
 
 #NO EDITS SHOULD BE REQUIRED AFTER THIS POINT
