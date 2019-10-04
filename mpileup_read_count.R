@@ -47,8 +47,8 @@ mpileup_function <- function(patient, patid, chrinput){
     zerofiles <- allfiles[which(filesizes=='0')]
     
     #Get file name stem that would correspond to this file for following checks
-    num_slashes <- length(paste0(unlist(strsplit(paste0(unlist(strsplit(chosen[1], split = '/'))), split = '.bam'))))-1
-    patientsstem <- paste0(unlist(strsplit(paste0(unlist(strsplit(chosen, split = '/')))[(1+num_slashes)*(patientid)], split = '.bam')))[1]
+    num_slashes <- length(paste0(unlist(strsplit(chosen[patientid], split = '/'))))-1
+    patientsstem <- paste0(unlist(strsplit(paste0(unlist(strsplit(chosen[patientid], split = '/')))[(1+num_slashes)], split = '.bam')))[1]
     
     #Check if file already exists. If so:
     if(length(grep(patientsstem, allfiles))>0){
