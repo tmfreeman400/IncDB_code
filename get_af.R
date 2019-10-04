@@ -12,7 +12,7 @@ build_number <- 38 #Replace with 37 if you are using build 37
 #NO EDITS SHOULD BE REQUIRED AFTER THIS POINT
 args[3] <- build_number
 
-directories <- unlist(strsplit(scan(pat_filepaths, what = 'character')[1], split='/'))
+directories <- unlist(strsplit(scan(pat_filepaths, what = 'character')[as.numeric(args[2])], split='/'))
 finalsplit <- paste0('_', directories[length(directories)-1], '_') #Name of the last sub-directory in which bam files are located
 
 #NO EDITS SHOULD BE REQUIRED AFTER THIS POINT
