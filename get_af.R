@@ -12,6 +12,7 @@ build_number <- 38 #Replace with 37 if you are using build 37
 #NO EDITS SHOULD BE REQUIRED AFTER THIS POINT
 args[3] <- build_number
 
+project_directory <- paste0(project_directory, '/')
 directories <- unlist(strsplit(scan(pat_filepaths, what = 'character')[as.numeric(args[2])], split='/'))
 finalsplit <- paste0('_', directories[length(directories)-1], '_') #Name of the last sub-directory in which bam files are located
 
@@ -35,7 +36,7 @@ patnum = grep(pattern = pat_fragments[length(pat_fragments)], x = uniq_stems)
 
 #Check if soloDB already exists and stop job if so.
 #Comment below 11 lines to remove this step
-patientsstem <- paste0(unlist(strsplit(paste0(unlist(strsplit(uniq_stems, split = finalsplit)))[2*(patnum)], split = '.bam')))[1]
+patientsstem <- paste0(unlist(strsplit(paste0(unlist(strsplit(uniq_stems[patnum], split = finalsplit)))[2], split = '.bam')))[1]
 if(length(grep('solo', system('ls', intern = TRUE)))!=0){
   filesizes <- system(paste0("ls -l ", project_directory, "/chr", chrnum, "/*soloDB | awk '{print $5}' "), intern = TRUE)
   allfiles  <- system(paste0("ls -l ", project_directory, "/chr", chrnum, "/*soloDB | awk '{print $9}' "), intern = TRUE)
